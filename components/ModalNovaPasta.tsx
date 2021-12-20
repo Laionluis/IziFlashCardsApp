@@ -1,12 +1,13 @@
 import React, { useState, Fragment } from "react";
 import { Alert, Modal, StyleSheet, Text,TextInput, Button, View, TouchableWithoutFeedback, TouchableOpacity, Image, ActivityIndicator, CheckBox,ScrollView } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {addData, insereSubPasta} from '../services/pastaService';
+import {addData, insereSubPasta, atualizarPasta, atualizarSubPasta, deleteSubPastaPorId,findByIdPasta} from '../services/pastaService';
 
-export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, setModalVisible})
+export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, setModalVisible, nodeEditar})
 {
     const [pasta, setPasta] = useState('');
     const [subPastas, setSubPastas] = useState([]);
+    const [subPastasDeletar, setSubPastasDeletar] = useState([]);
     const [subPasta, setSubPasta] = useState('');
     const [apertouSalvar, setApertouSalvar] = useState(false);
     const [terminou, setTerminou] = useState(false);
@@ -18,16 +19,27 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
     function limpaCampos(){
         setTerminou(true);
         setApertouSalvar(false);
-        setSucesso("Pasta salva com sucesso.");
+        setSucesso("Matéria salva com sucesso.");
         setPasta('');
         setSubPasta('');
         setSubPastas([]);
         setSelection(true);
-        setTimeout(() => {setTerminou(false)}, 3000);        
+        setTimeout(() => {setTerminou(false)}, 3000);     
+        setTimeout(() => {setModalVisible(false)}, 1000);   
     }
 
     function salvaSubPasta(aux){
         insereSubPasta(aux).then((resp1) => {
+            limpaCampos();
+        }).catch((error) => {
+            setNomeError(error);
+            setSucesso('');
+            setApertouSalvar(false);
+        });          
+    }
+
+    function updateSubPasta(aux){
+        atualizarSubPasta(aux).then((resp1) => {
             limpaCampos();
         }).catch((error) => {
             setNomeError(error);
@@ -64,16 +76,60 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
 
     function salvar() {  
         if (pasta.trim() === "") {
-            setNomeError("Nome da pasta é obrigatório.");
+            setNomeError("Matéria é obrigatório.");
             setSucesso('');
-        } else {            
-            salvarPasta();     
+        } else {         
+            if(nodeEditar != null && nodeEditar.id > 0)
+                updatePasta();
+            else
+                salvarPasta();     
         }        
+    }
+
+    function updatePasta(){
+        setNomeError(null);
+        setApertouSalvar(true);
+        var parametros = {
+            nome: pasta,
+            id: nodeEditar.id
+        };     
+        atualizarPasta(parametros).then((resp) => {            
+            if (subPastas.length != 0){
+                subPastas.forEach(element => {
+                    var parametrosSubPasta = {
+                        nome: element.nome,
+                        idPasta: nodeEditar.id,
+                        id: element.idTemp
+                    };        
+                    if(element.existe){
+                        updateSubPasta(parametrosSubPasta);
+                    } else{
+                        salvaSubPasta(parametrosSubPasta);
+                    }       
+                });    
+                if (subPastasDeletar.length != 0){
+                    subPastasDeletar.forEach(element => {
+                        deleteSubPastaPorId(element.idTemp).then((resp1) => {
+                            console.log('deletado SubPasta' + element.idTemp);
+                        }).catch((error) => {
+                            console.log(error);
+                        });   
+                    }); 
+                }         
+            }else{
+                limpaCampos();
+            }    
+            carregarTreeview();                         
+        }).catch((error) => {
+            setNomeError(error);
+            setSucesso('');
+            setApertouSalvar(false);
+        });           
     }
 
     function addSubPasta(ehPrimeiro) {  
         if (subPasta.trim() === "") {
-            setNomeError("Nome da sub pasta é obrigatório.");
+            setNomeError("Assunto é obrigatório.");
             setSucesso('');
         } else {     
             setNomeError(null);
@@ -96,6 +152,54 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
         var listaSubPasta = subPastas;
         const filteredItems = listaSubPasta.filter(item => item !== itemAremover)
         setSubPastas(filteredItems);
+
+        if(itemAremover.existe){
+            let newArr = [...subPastasDeletar]; 
+            newArr.push(itemAremover);
+
+            setSubPastasDeletar(newArr);
+        }
+    }
+
+    function RecuperarDados(){
+        setPasta('');
+        setSubPastas([]);
+        
+        if(nodeEditar != null){            
+            if(nodeEditar.id > 0 && nodeEditar.ehPai){
+                carregaDados(nodeEditar);
+            } else if(nodeEditar.parent != null && nodeEditar.parent > 0){
+                findByIdPasta(nodeEditar.parent).then((result) => 
+                {         
+                    if(result != null && result.length > 0){
+                        carregaDados(result[0]);
+                    } 
+                });    
+            }
+        }
+    }
+
+    function carregaDados(node){
+        var listaSubPasta = [];
+        setPasta(node.nome);
+        if(node.children){
+            for (let index = 0; index < node.children.length; index++) {
+                const element = node.children[index];                        
+                var subPastaItem = {
+                    nome: element.nome,
+                    idTemp: element.id,
+                    existe: true
+                };     
+                listaSubPasta.push(subPastaItem);                
+            }
+            setSubPastas(listaSubPasta);
+        }
+    }
+
+    function onChangeText(text, index) {          
+        let newArr = [...subPastas]; 
+        newArr[index].nome = text;
+        setSubPastas(newArr);
     }
 
     function getTextInputSubPasta(ehPrimeiro){
@@ -103,7 +207,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
             <View style={styles.fixToText2}>
                 <TextInput style = {styles.input2}
                 underlineColorAndroid = "transparent"
-                placeholder = "Nome sub pasta"
+                placeholder = "Assunto"
                 placeholderTextColor = "#9a73ef"
                 autoCapitalize = "none"
                 onChangeText={text => setSubPasta(text)}
@@ -118,7 +222,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
                     justifyContent: 'center',
                     width: 30,                    
                     top: 10,
-                    right: 7,
+                    right: 0,
                     height: 30,
                     backgroundColor: '#fff',
                     borderRadius: 100,
@@ -135,26 +239,26 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
         if (subPastas.length != 0){
             return(
                 <ScrollView style={styles.scrollViewStyle}>
-                    {subPastas.map((data) =>    
+                    {subPastas.map((data, index) =>    
                         <View key={data.idTemp}  style={styles.fixToText2}>
                             <TextInput style = {styles.input2}
                             underlineColorAndroid = "transparent"
-                            placeholder = "Nome sub pasta"
+                            placeholder = "Assunto"
                             placeholderTextColor = "#9a73ef"
                             autoCapitalize = "none"
-                            editable={false}
+                            editable={true}
                             value={data.nome}
+                            onChangeText={text => onChangeText(text, index)}
                             />
                         
                             <TouchableOpacity
                             style={{
                                 borderWidth: 1,
                                 borderColor: 'black',
-                                alignItems: 'center',
-                                justifyContent: 'center',
                                 width: 30,                    
                                 top: 10,
-                                right: 7,
+                                marginRight: 0,
+                                marginLeft: 0,
                                 height: 30,
                                 backgroundColor: '#fff',
                                 borderRadius: 100,
@@ -186,50 +290,53 @@ return (
         onRequestClose={() => {         
             setModalVisible(!modalVisible);
         }}
+        onShow={() => {         
+            RecuperarDados();
+        }}
     >
         <TouchableWithoutFeedback onPress={() => {setModalVisible(false)}}>
             <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
 
         <View>
-        <View style={styles.modalView}>            
-            <TextInput style = {styles.input}
-            underlineColorAndroid = "transparent"
-            placeholder = "Nome pasta"
-            placeholderTextColor = "#9a73ef"
-            autoCapitalize = "none"
-            onChangeText={text => setPasta(text)}
-            value={pasta}
-            />
+            <View style={styles.modalView}>            
+                <TextInput style = {styles.input}
+                underlineColorAndroid = "transparent"
+                placeholder = "Matéria"
+                placeholderTextColor = "#9a73ef"
+                autoCapitalize = "none"
+                onChangeText={text => setPasta(text)}
+                value={pasta}
+                />
 
-            {!!nomeError && (
-            <Text style={{ color: "red" }}>{nomeError}</Text>
-            )}
-            
-            {SubPastas()}                
-                     
-            <View style={styles.fixToText}>  
-                <TouchableOpacity
-                    style={styles.Buttons}                                    
-                    onPress={() => setModalVisible(!modalVisible)}>
-                    <Text> Cancelar </Text>        
-                </TouchableOpacity>  
-                <TouchableOpacity
-                    style={styles.Buttons}                                    
-                    onPress={() => salvar()}>
-                    <Text style={apertouSalvar? {display: 'none'} : !terminou? {display: 'flex'} : {display: 'none'}}> Salvar </Text>
-                    <ActivityIndicator size="small" color="#00ff00" 
-                        style={apertouSalvar && !terminou? {display: 'flex'} : {display: 'none'}} 
-                    />
-                    <Icon style={terminou? {display: 'flex'} : {display: 'none'}} 
-                        name="done" size={20} color="#00ff00"
-                    />
-                </TouchableOpacity>      
+                {!!nomeError && (
+                <Text style={{ color: "red" }}>{nomeError}</Text>
+                )}
+                
+                {SubPastas()}                
+                        
+                <View style={styles.fixToText}>  
+                    <TouchableOpacity
+                        style={styles.Buttons}                                    
+                        onPress={() => setModalVisible(!modalVisible)}>
+                        <Text style={{color: 'white'}}> Cancelar </Text>        
+                    </TouchableOpacity>  
+                    <TouchableOpacity
+                        style={styles.Buttons}                                    
+                        onPress={() => salvar()}>
+                        <Text style={apertouSalvar? {display: 'none'} : !terminou? {display: 'flex', color: 'white'} : {display: 'none'}}> Salvar </Text>
+                        <ActivityIndicator size="small" color="#00ff00" 
+                            style={apertouSalvar && !terminou? {display: 'flex'} : {display: 'none'}} 
+                        />
+                        <Icon style={terminou? {display: 'flex'} : {display: 'none'}} 
+                            name="done" size={20} color="#00ff00"
+                        />
+                    </TouchableOpacity>      
+                </View>
+                {!!sucesso && terminou && (
+                <Text style={{ color: "green" }}>{sucesso}</Text>
+                )}
             </View>
-            {!!sucesso && terminou && (
-            <Text style={{ color: "green" }}>{sucesso}</Text>
-            )}
-        </View>
         </View>
         </Modal>
        
@@ -246,8 +353,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
-        width: 0,
-        height: 2
+            width: 0,
+            height: 2
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
@@ -256,10 +363,6 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: 20,
         padding: 10,
-        elevation: 2
-    },
-    button: {
-        borderRadius: 20,
         elevation: 2
     },
     buttonOpen: {
@@ -293,8 +396,7 @@ const styles = StyleSheet.create({
         width:100,
         alignItems:"center",
         justifyContent:"center",
-        marginTop:15,
-        marginBottom:10,
+        margin: 15
     },
     input: {
         margin: 5,
@@ -305,11 +407,13 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     input2: {
-        margin: 5,
+        marginTop: 5,
+        marginBottom: 5,  
         marginLeft: 0,
-        width: '80%',
+        marginRight: 5,
+        width: '85%',
         marginHorizontal: 10,
-        padding: 4,
+        padding: 5,
         borderColor: '#7a42f4',
         borderWidth: 1
     },
@@ -321,9 +425,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',        
     },
     scrollViewStyle: {
-        height: 300,
-        right: 5,
-        marginLeft: 0,
+        height: 300,    
+        marginRight: 0,
+        marginLeft: 0
     },
 
 });

@@ -24,17 +24,17 @@ export default function BottomTabNavigator() {
       initialRouteName="TabOne"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
-        name="Cards"
-        component={TabOneNavigator}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="copy-outline" color={color} />,
-        }}
-      />
-      <BottomTab.Screen
         name="Criar"
         component={TabTwoNavigator}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="duplicate-outline" color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Cards"
+        component={ TabOneNavigator}
+        options={{
+          tabBarIcon: ({ color }) => <TabBarIcon name="copy-outline" color={color} />,          
         }}
       />
     </BottomTab.Navigator>
@@ -57,7 +57,7 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="TabOneScreen"
         component={TabOneScreen}
-        options={{ headerTitle: 'FlashCards' }}
+        options={{ headerTitle: 'Cards' }}
       />
     </TabOneStack.Navigator>
   );
@@ -71,7 +71,7 @@ function TabTwoNavigator() {
       <TabTwoStack.Screen
         name="CriarEditarCards"
         component={CriarEditarCards}
-        options={{ headerTitle: 'Criar/Editar FlashCards' }}
+        options={{ headerTitle: 'Criar/Editar Cards' }}
       />
     </TabTwoStack.Navigator>
   );

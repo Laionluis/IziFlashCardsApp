@@ -1,8 +1,56 @@
 import React, { useState } from 'react';
 import { Alert, Modal, StyleSheet, Text, TouchableHighlight,TouchableWithoutFeedback, View, TouchableOpacity } from 'react-native';
+import {deletePasta, deleteSubPastaPorId, deleteSubPastaPorPai} from '../services/pastaService';
+import ModalCriarEditarPasta from '../components/ModalNovaPasta';
 
-export default function PopUpOptions({modalVisible, setModalVisible, locationY}) 
+export default function PopUpOptions({carregarTreeview, modalVisible, setModalVisible, locationY, idLongPress, navigation}) 
 {
+    const [modalEditarVisibleAddPasta, setModalEditarVisibleAddPasta] = useState(false);
+
+    function irParaPaginaCriarCard() {
+        navigation.navigate('CriarFlashCard', {
+            cardBanco: idLongPress,
+        });
+    }
+    
+    function deletePasta_Click() {  
+        if(idLongPress.children != null)
+        {            
+            deleteSubPastaPorPai(idLongPress.id).then((resp1) => {
+                console.log('deletado subPasta' + idLongPress.id);            
+            }).catch((error) => {
+                console.log(error);
+            });      
+        }
+
+        if(idLongPress.parent != null){
+            deleteSubPastaPorId(idLongPress.id).then((resp1) => {
+                console.log('deletado SubPasta' + idLongPress.id);
+                carregarTreeview();
+                setModalVisible(false);
+            }).catch((error) => {
+                console.log(error);
+            });   
+        } else{
+            deletePasta(idLongPress.id).then((resp1) => {
+                console.log('deletado Pasta' + idLongPress.id);
+                carregarTreeview();
+                setModalVisible(false);
+            }).catch((error) => {
+                console.log(error);
+            });   
+        }   
+    }
+
+    function editarPasta_Click(){
+        if(idLongPress.ehFlashCard){
+            setModalVisible(false);
+            irParaPaginaCriarCard();
+        } else{            
+            setModalEditarVisibleAddPasta(true);
+        }
+    }
+
     return (
         <View>
             <Modal
@@ -18,15 +66,16 @@ export default function PopUpOptions({modalVisible, setModalVisible, locationY})
 
                 <View style={{top: locationY-10, flex: 1, alignItems: 'center', right: 30}}>
                     <View style={styles.modalView}>
-                        <TouchableOpacity style={styles.buttonTouch}>
+                        <TouchableOpacity style={styles.buttonTouch} onPress={() => {editarPasta_Click()}}>
                             <Text style={styles.modalText}>Editar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonTouch}>
+                        <TouchableOpacity style={styles.buttonTouch} onPress={() => {deletePasta_Click()}}>
                             <Text style={styles.modalText}>Excluir</Text>    
                         </TouchableOpacity>            
                     </View>
                 </View>
             </Modal>
+            <ModalCriarEditarPasta carregarTreeview={carregarTreeview} modalVisible={modalEditarVisibleAddPasta} setModalVisible={setModalEditarVisibleAddPasta} nodeEditar={idLongPress}  />
         </View>
   );
 }
@@ -35,13 +84,12 @@ const styles = StyleSheet.create({
     modalView: {
         backgroundColor: 'white',
         borderRadius: 10,
-        borderTopLeftRadius: 0,
         padding: 20,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
-        width: 0,
-        height: 2,
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,

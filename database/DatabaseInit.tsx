@@ -29,6 +29,29 @@ export default class DatabaseInit {
                 nome text NOT NULL                  
             );`,
 
+            `create table if not exists FlashCard (
+                id integer primary key autoincrement NOT NULL,
+                idMateria null,
+                idAssunto null,
+                titulo text NOT NULL,
+                FOREIGN KEY (idMateria)
+                    REFERENCES Pasta (id)
+                        ON DELETE CASCADE,
+                FOREIGN KEY (idAssunto)
+                    REFERENCES SubPasta (id) 
+                        ON DELETE CASCADE                   
+            );`,
+
+            `create table if not exists Cards (
+                id integer primary key autoincrement NOT NULL,
+                frente text NOT NULL,
+                verso text NOT NULL,
+                idFlashCard integer NOT NULL,
+                FOREIGN KEY (idFlashCard)
+                    REFERENCES FlashCard (id)       
+                        ON DELETE CASCADE           
+            );`,
+
             `create table if not exists SubPasta (
                 id integer primary key autoincrement NOT NULL,
                 nome text NOT NULL,
