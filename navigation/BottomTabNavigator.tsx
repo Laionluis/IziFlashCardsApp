@@ -16,12 +16,12 @@ import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigator({ route, navigation }) {
   const colorScheme = useColorScheme();
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="Criar"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
         name="Criar"
@@ -32,7 +32,7 @@ export default function BottomTabNavigator() {
       />
       <BottomTab.Screen
         name="Cards"
-        component={ TabOneNavigator}
+        component={TabOneNavigator}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="copy-outline" color={color} />,          
         }}
@@ -57,6 +57,7 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="TabOneScreen"
         component={TabOneScreen}
+        initialParams={{ nodeBanco: null }}
         options={{ headerTitle: 'Cards' }}
       />
     </TabOneStack.Navigator>

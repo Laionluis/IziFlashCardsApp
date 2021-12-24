@@ -32,7 +32,7 @@ function getListaTreeView() {
     }
 }
 
-export default function CriarEditarCards({navigation,}) {
+export default function CriarEditarCards({navigation, route}) {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisibleAddPasta, setModalVisibleAddPasta] = useState(false);
@@ -96,9 +96,23 @@ export default function CriarEditarCards({navigation,}) {
         } else{
             setLocationY(evt.nativeEvent.pageY);
         }
-
+        
         setNodeLongPress(node);
         setModalVisible(true);
+    }
+
+    function onPress({node, level}){
+        if(node != null && node.ehFlashCard != null && node.ehFlashCard == true){
+            navigation.navigate('Root', {
+                screen: 'Cards',
+                params: {
+                    screen: 'TabOneScreen',
+                    params: {
+                        nodeBanco: node,
+                    },
+                }
+            });
+        }
     }
 
     function getIndicator(isExpanded, hasChildrenNodes, node) {
@@ -154,6 +168,7 @@ export default function CriarEditarCards({navigation,}) {
                         );
                     }}
                     onNodeLongPress={onNodeLongPress}
+                    onNodePress={onPress}
                 />
                 <PopUpOptions carregarTreeview={reCarregaTreeView} modalVisible={modalVisible} setModalVisible={setModalVisible} locationY={locationY} idLongPress={nodeLongPress} navigation={navigation}   />
             </ScrollView>

@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../types';
 import ModalSelecionarMateria from '../components/ModalSelecionarMateria';
 import ModalSelecionarAssunto from '../components/ModalSelecionarAssunto';
-import {insereFlashCard, insereCards, findFlashCardPorId} from '../services/pastaService';
+import {insereFlashCard, insereCards, findFlashCardPorId, findByIdPasta,findCardsPorIdFlashCard} from '../services/pastaService';
 
 export default function CriarFlashCard({ route, navigation }) {
   const [flashCards, setFlashCards] = useState([]);
@@ -38,8 +38,7 @@ export default function CriarFlashCard({ route, navigation }) {
     setTitulo('');
     setFrente('');
     setVerso('');
-    setFlashCards([]);   
-    navigation.goBack();
+    setFlashCards([]);       
   }
 
   function RecuperarDados(){
@@ -49,14 +48,12 @@ export default function CriarFlashCard({ route, navigation }) {
       };    
       findFlashCardPorId(param).then((result) => 
       {          
-        console.log(result);
         setTitulo(result.titulo);
         if(result.idMateria != null){
-          var materiaItem = {
-            nome:result.nomeMateria,
-            id: result.idMateria
-          };
-          setMateria(materiaItem);
+          findByIdPasta(result.idMateria).then((result2) => 
+          {          
+            setMateria(result2[0]);
+          });              
         }
         if(result.idAssunto != null){
           var assuntoItem = {
@@ -65,6 +62,10 @@ export default function CriarFlashCard({ route, navigation }) {
           };
           setAssunto(assuntoItem);
         }
+        findCardsPorIdFlashCard(result.idFlashCard).then((result3) => 
+        {          
+          setFlashCards(result3);
+        });   
       });    
     }
   }
@@ -129,7 +130,10 @@ export default function CriarFlashCard({ route, navigation }) {
           insereCards(Card).then((result) => 
           {    
             limpaCampos();
-           
+            console.log('going back');
+            navigation.navigate('Root', {
+                screen: 'Criar'                
+            });
           }).catch((error) => {
             setNomeError(error);
             setSucesso('');
@@ -225,7 +229,7 @@ export default function CriarFlashCard({ route, navigation }) {
             <Text style={{ paddingRight: 5}}> {materia.nome} </Text>
         </TouchableOpacity>
 
-        {materia.id != null && materia.children != null && <TouchableOpacity style={styles.addMateriaButton} onPress={() => setModalVisibleAssunto(true)} >
+        {(materia.id != null && materia.children != null) && <TouchableOpacity style={styles.addMateriaButton} onPress={() => setModalVisibleAssunto(true)} >
             <Icon name='edit' size={25} color='#01a699' style={{padding: 5}} />
             <Text style={{ paddingRight: 5}}> {assunto.nome} </Text>
         </TouchableOpacity>}

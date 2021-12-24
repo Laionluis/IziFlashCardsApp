@@ -66,6 +66,9 @@ export default function PopUpOptions({carregarTreeview, modalVisible, setModalVi
 
                 <View style={{top: locationY-10, flex: 1, alignItems: 'center', right: 30}}>
                     <View style={styles.modalView}>
+                        {idLongPress.ehFlashCard == null && <TouchableOpacity style={styles.buttonTouch} onPress={() => {editarPasta_Click()}}>
+                            <Text style={styles.modalText}>Criar</Text>
+                        </TouchableOpacity>}
                         <TouchableOpacity style={styles.buttonTouch} onPress={() => {editarPasta_Click()}}>
                             <Text style={styles.modalText}>Editar</Text>
                         </TouchableOpacity>

@@ -342,10 +342,11 @@ export async function findFlashCardPorId(param) {
     let pastas = []; 
 
     return new Promise((resolve, reject) => db.transaction(tx => {
-            tx.executeSql(`select fc.id as idFlashCard, fc.titulo as titulo, fc.idAssunto as idAssunto, fc.idMateria as idMateria, p.nome as nomeMateria, sp.nome as nomeAssunto 
+            tx.executeSql(`select fc.id as idFlashCard, fc.titulo as titulo, fc.idAssunto as idAssunto, COALESCE(fc.idMateria,sp.idPasta) as idMateria, COALESCE(p.nome,psp.nome)  as nomeMateria, sp.nome as nomeAssunto 
                             from FlashCard as fc
                             left join Pasta p on p.id = fc.idMateria 
                             left join SubPasta sp on sp.id = fc.idAssunto 
+                            left join Pasta psp on psp.id = sp.idPasta
                             where fc.id = ? `, [param.idFlashCard], (_, { rows }) => {        
                 var rows_ = rows._array;
                                 
@@ -371,5 +372,21 @@ export async function deleteFlashCardsPorMateria(idPasta) {
             }));
 }
 
-export default {addData, findAll, findAllFlashCards,findFlashCardPorId, findByIdPasta, deletePasta, deleteSubPastaPorPai, deleteSubPastaPorId, insereSubPasta, findAllSubPasta, atualizarPasta, atualizarSubPasta, insereFlashCard, insereCards}
+export async function findCardsPorIdFlashCard(idflashcard) {
+    let pastas = []; 
+
+    return new Promise((resolve, reject) => db.transaction(tx => {
+            tx.executeSql(`select fc.id as id, fc.frente as frente, fc.verso as verso
+                            from Cards as fc                           
+                            where fc.idFlashCard = ? `, [idflashcard], (_, { rows }) => {        
+                var rows_ = rows._array;                                
+                resolve(rows_);
+            }), (sqlError) => {
+                console.log(sqlError);
+            }}, (txError) => {
+            console.log(txError);
+        }))       
+}
+
+export default {addData, findAll, findCardsPorIdFlashCard, findAllFlashCards,findFlashCardPorId, findByIdPasta, deletePasta, deleteSubPastaPorPai, deleteSubPastaPorId, insereSubPasta, findAllSubPasta, atualizarPasta, atualizarSubPasta, insereFlashCard, insereCards}
 

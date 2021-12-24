@@ -4,32 +4,9 @@ import {  Text, View,  SafeAreaView, TouchableOpacity, Alert, Button, StyleSheet
 import CardFlip from 'react-native-card-flip';
 import { useState, Fragment, useRef } from 'react';
 
-export default function MyCarousel() {
+export default function MyCarousel({carouselItems}) {
     const teste = useRef(this);
     const [activeIndex, setActiveIndex] = useState(0);
-    const [carouselItems, setCarouselItems] = useState([
-          {
-              title:"Item 1",
-              text: "Text 1",
-          },
-          {
-              title:"Item 2",
-              text: "Text 2",
-          },
-          {
-              title:"Item 3",
-              text: "Text 3",
-          },
-          {
-              title:"Item 4",
-              text: "Text 4",
-          },
-          {
-              title:"Item 5",
-              text: "Text 5",
-          },
-         
-        ]);
         
     function renderItem({item,index}){
         return (
