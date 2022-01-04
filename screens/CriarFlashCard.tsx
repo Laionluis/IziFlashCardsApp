@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../types';
 import ModalSelecionarMateria from '../components/ModalSelecionarMateria';
 import ModalSelecionarAssunto from '../components/ModalSelecionarAssunto';
-import {insereFlashCard, insereCards, findFlashCardPorId, findByIdPasta,findCardsPorIdFlashCard} from '../services/pastaService';
+import {insereFlashCard, insereCards, findFlashCardPorId, findByIdPasta,findCardsPorIdFlashCard,atualizarFlashCard, atualizarCard, deleteCardPorId} from '../services/pastaService';
 
 export default function CriarFlashCard({ route, navigation }) {
   const [flashCards, setFlashCards] = useState([]);
@@ -20,6 +20,7 @@ export default function CriarFlashCard({ route, navigation }) {
   const [modalVisibleAssunto, setModalVisibleAssunto] = useState(false);
   const [apertouSalvar, setApertouSalvar] = useState(false);
   const [terminou, setTerminou] = useState(false);
+  const [cardsDeletar, setCardsDeletar] = useState([]);
 
   const { cardBanco } = route.params;
 
@@ -42,7 +43,19 @@ export default function CriarFlashCard({ route, navigation }) {
   }
 
   function RecuperarDados(){
-    if(cardBanco != null){
+    if(route != null && route.params != null && route.params.criarNovo && cardBanco != null){
+      //console.log(cardBanco);
+      if(cardBanco.ehPai){
+        setMateria(cardBanco);
+      } else if (cardBanco.parent != null){
+        setAssunto(cardBanco);
+        findByIdPasta(cardBanco.parent).then((result2) => 
+        {          
+          setMateria(result2[0]);
+        });      
+      }
+    } else
+    if(cardBanco != null){      
       var param = {
           idFlashCard: cardBanco.id.substring(0, cardBanco.id.length - 1),           
       };    
@@ -97,7 +110,11 @@ export default function CriarFlashCard({ route, navigation }) {
   function removerFlashCard(itemAremover) {  
         var listaSubPasta = flashCards;
         const filteredItems = listaSubPasta.filter(item => item !== itemAremover)
-        setFlashCards(filteredItems);      
+        setFlashCards(filteredItems); 
+
+        var lista = cardsDeletar;   
+        lista.push(itemAremover);
+        setCardsDeletar(lista);
     }
 
   function salvarFlashCard(){
@@ -109,42 +126,115 @@ export default function CriarFlashCard({ route, navigation }) {
       setSucesso('');
     }     
     else {
-      setNomeError(null);
-      setApertouSalvar(true);
-      var flashCard = {
-          titulo: titulo,
-          idMateria: materia != null? (assunto.id != null ? null : materia.id) : null,
-          idAssunto: assunto != null? assunto.id : null
-      };     
       
-      insereFlashCard(flashCard).then((result) => 
-      {         
-        var idFlashCard = result;
-        for (let index = 0; index < flashCards.length; index++) {
-          const element = flashCards[index];
-          var Card = {
-            frente: element.frente,
-            verso: element.verso,
-            idFlashCard: idFlashCard
-          };  
-          insereCards(Card).then((result) => 
-          {    
-            limpaCampos();
-            console.log('going back');
-            navigation.navigate('Root', {
-                screen: 'Criar'                
-            });
+        setNomeError(null);
+        setApertouSalvar(true);
+        var flashCard = {
+            titulo: titulo,
+            idMateria: materia != null? (assunto.id != null ? null : materia.id) : null,
+            idAssunto: assunto != null? assunto.id : null
+        };     
+        console.log(cardBanco);
+        if(cardBanco == null || cardBanco.ehFlashCard == null){
+          insereFlashCard(flashCard).then((result) => 
+          {         
+            var idFlashCard = result;
+            for (let index = 0; index < flashCards.length; index++) {
+              const element = flashCards[index];
+              var Card = {
+                frente: element.frente,
+                verso: element.verso,
+                idFlashCard: idFlashCard
+              };  
+              insereCards(Card).then((result) => 
+              {    
+                limpaCampos();
+                navigation.navigate('Root', {
+                    screen: 'Criar' ,
+                    params: {
+                        screen: 'CriarEditarCards',
+                        params: {
+                            recarregar: true,
+                        },
+                    }              
+                });
+              }).catch((error) => {
+                setNomeError(error);
+                setSucesso('');
+                setApertouSalvar(false);
+              });     
+            }
           }).catch((error) => {
-            setNomeError(error);
-            setSucesso('');
-            setApertouSalvar(false);
-          });     
-        }
-      }).catch((error) => {
-          setNomeError(error);
-          setSucesso('');
-          setApertouSalvar(false);
-      });             
+              setNomeError(error);
+              setSucesso('');
+              setApertouSalvar(false);
+          });
+        } else {
+          console.log('atualizando');
+          flashCard.id = cardBanco.id.substring(0, cardBanco.id.length - 1);
+          console.log(flashCard);
+          atualizarFlashCard(flashCard).then((result) => 
+          {         
+            var idFlashCard = flashCard.id;
+            for (let index = 0; index < cardsDeletar.length; index++) {
+              const element = cardsDeletar[index];
+              if(element.id != null){
+                deleteCardPorId(element.id).then((result) => 
+                {                    
+                }).catch((error) => {
+                  setNomeError(error);
+                  setSucesso('');
+                  setApertouSalvar(false);
+                });    
+              }               
+            }
+            for (let index = 0; index < flashCards.length; index++) {
+              const element = flashCards[index];
+              
+              var Card = {
+                frente: element.frente,
+                verso: element.verso,
+                idFlashCard: idFlashCard,
+              };             
+              //insere card novo, senao atualiza existente
+              if(element.id == null){
+                insereCards(Card).then((result) => 
+                {                    
+                }).catch((error) => {
+                  setNomeError(error);
+                  setSucesso('');
+                  setApertouSalvar(false);
+                });     
+              } else {
+                Card.id = element.id;
+                atualizarCard(Card).then((result) => 
+                {                    
+                }).catch((error) => {
+                  setNomeError(error);
+                  setSucesso('');
+                  setApertouSalvar(false);
+                });     
+              }
+              
+              limpaCampos();
+              navigation.navigate('Root', {
+                  screen: 'Criar' ,
+                  params: {
+                      screen: 'CriarEditarCards',
+                      params: {
+                          recarregar: true,
+                      },
+                  }              
+              });
+            }
+          }).catch((error) => {
+              setNomeError(error);
+              setSucesso('');
+              setApertouSalvar(false);
+          });
+        }             
+    
+      
     }
   }
 

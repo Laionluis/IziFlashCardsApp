@@ -184,13 +184,17 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
         setPasta(node.nome);
         if(node.children){
             for (let index = 0; index < node.children.length; index++) {
-                const element = node.children[index];                        
-                var subPastaItem = {
-                    nome: element.nome,
-                    idTemp: element.id,
-                    existe: true
-                };     
-                listaSubPasta.push(subPastaItem);                
+                const element = node.children[index]; 
+                console.log(element);
+                if(element.ehFlashCard == null)   {
+                    var subPastaItem = {
+                        nome: element.nome,
+                        idTemp: element.id,
+                        existe: true
+                    };     
+                    listaSubPasta.push(subPastaItem);     
+                }                    
+                           
             }
             setSubPastas(listaSubPasta);
         }
@@ -287,6 +291,7 @@ return (
         animationType="slide"
         transparent={true}
         visible={modalVisible}
+        seNativeDriver={true}
         onRequestClose={() => {         
             setModalVisible(!modalVisible);
         }}

@@ -8,8 +8,9 @@ export default function ModalSelecionarAssunto({modalVisible, setModalVisible, m
     const [assuntos, setAssuntos] = useState([]);
 
     function RecuperarDados(){        
-        setAssuntos([]);        
-        setAssuntos(materia.children);       
+        setAssuntos([]);     
+        var lista = materia.children.filter(function(element){ return element.ehFlashCard == null; })
+        setAssuntos(lista);       
     }
 
     function AposSelecionado(data){        
@@ -23,6 +24,7 @@ export default function ModalSelecionarAssunto({modalVisible, setModalVisible, m
             animationType="slide"
             transparent={true}
             visible={modalVisible}
+            seNativeDriver={true}
             onRequestClose={() => {         
                 setModalVisible(!modalVisible);
             }}
@@ -37,7 +39,7 @@ export default function ModalSelecionarAssunto({modalVisible, setModalVisible, m
                 <View>
                     <View style={styles.modalView}>         
                         <ScrollView >
-                            {assuntos.map((data, index) =>    
+                            {assuntos != null && assuntos.map((data, index) =>    
                             <View key={data.id}  style={styles.fixToText2}>    
 
                                 <TouchableOpacity style = {{padding: 5, width: 200, borderWidth: 1, margin: 5, borderRadius: 20}} onPress={() => AposSelecionado(data)}>

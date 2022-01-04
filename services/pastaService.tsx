@@ -388,5 +388,61 @@ export async function findCardsPorIdFlashCard(idflashcard) {
         }))       
 }
 
-export default {addData, findAll, findCardsPorIdFlashCard, findAllFlashCards,findFlashCardPorId, findByIdPasta, deletePasta, deleteSubPastaPorPai, deleteSubPastaPorId, insereSubPasta, findAllSubPasta, atualizarPasta, atualizarSubPasta, insereFlashCard, insereCards}
+export async function deleteFlashCardsPorId(idFlashCard) {
+    return new Promise((resolve, reject) =>db.transaction(
+            tx => {
+                tx.executeSql(`delete from FlashCard where id = ?`, 
+                [idFlashCard], 
+                (_, results) => {
+                    resolve(results.rowsAffected)
+                }), (sqlError) => {
+                    console.log(sqlError);
+                }}, (txError) => {
+                console.log(txError);
+            }));
+}
+
+export async function atualizarFlashCard(param) {
+    return new Promise((resolve, reject) =>db.transaction(
+            tx => {
+                tx.executeSql(`update FlashCard set idMateria = ?, idAssunto = ?, titulo = ? where id = ?`, 
+                [param.idMateria, param.idAssunto, param.titulo, param.id], 
+                (_, results) => {
+                    resolve(results.rowsAffected)
+                }), (sqlError) => {
+                    console.log(sqlError);
+                }}, (txError) => {
+                console.log(txError);
+            }));
+}
+
+export async function atualizarCard(param) {
+    return new Promise((resolve, reject) =>db.transaction(
+            tx => {
+                tx.executeSql(`update Cards set frente = ?, verso = ?, idFlashCard = ? where id = ?`, 
+                [param.frente, param.verso, param.idFlashCard, param.id], 
+                (_, results) => {
+                    resolve(results.rowsAffected)
+                }), (sqlError) => {
+                    console.log(sqlError);
+                }}, (txError) => {
+                console.log(txError);
+            }));
+}
+
+export async function deleteCardPorId(idCard) {
+    return new Promise((resolve, reject) =>db.transaction(
+            tx => {
+                tx.executeSql(`delete from Cards where id = ?`, 
+                [idCard], 
+                (_, results) => {
+                    resolve(results.rowsAffected)
+                }), (sqlError) => {
+                    console.log(sqlError);
+                }}, (txError) => {
+                console.log(txError);
+            }));
+}
+
+export default {addData, findAll,deleteCardPorId, findCardsPorIdFlashCard,deleteFlashCardsPorId,atualizarCard,atualizarFlashCard, findAllFlashCards,findFlashCardPorId, findByIdPasta, deletePasta, deleteSubPastaPorPai, deleteSubPastaPorId, insereSubPasta, findAllSubPasta, atualizarPasta, atualizarSubPasta, insereFlashCard, insereCards}
 

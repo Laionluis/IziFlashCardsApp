@@ -11,10 +11,24 @@ import LinkingConfiguration from './LinkingConfiguration';
 import CriarFlashCard from '../screens/CriarFlashCard';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
+
+  const MyTheme = {
+    dark: false,
+    colors: {
+      primary: 'rgb(69, 162, 158)',
+      background: 'rgb(242, 242, 242)',
+      card: 'rgb(31, 40, 51)',
+      text: 'rgb(194, 202, 208)',
+      border: 'rgb(69, 162, 158)',
+      notification: 'rgb(255, 69, 58)',
+    },
+  };
+
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      theme={MyTheme}
+      >
       <RootNavigator />
     </NavigationContainer>
   );

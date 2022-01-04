@@ -19,7 +19,7 @@ export default function ModalSelecionarMateria({modalVisible, setModalVisible, s
     }
 
     function AposSelecionado(data){
-        console.log(data);
+        //console.log(data);
         setMateria(data);
         setAssunto({nome: 'Assunto'});
         setModalVisible(false);
@@ -31,6 +31,7 @@ export default function ModalSelecionarMateria({modalVisible, setModalVisible, s
             animationType="slide"
             transparent={true}
             visible={modalVisible}
+            seNativeDriver={true}
             onRequestClose={() => {         
                 setModalVisible(!modalVisible);
             }}

@@ -5,6 +5,7 @@ import { SafeAreaView, Text, View, TouchableWithoutFeedback, TouchableOpacity, D
 import Icon from 'react-native-vector-icons/Ionicons';
 import ModalCriarEditarPasta from '../components/ModalNovaPasta';
 import PopUpOptions from '../components/PopUpOptions'
+import PopMenu from '../components/PopMenu'
 import TreeView from '../components/TreeView'
 import FloatingAction from '../components/FloatingButton'
 import {findAll, findAllSubPasta, findAllFlashCards} from '../services/pastaService';
@@ -35,6 +36,7 @@ function getListaTreeView() {
 export default function CriarEditarCards({navigation, route}) {
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [menuVisible, setMenuVisible] = useState(false);
     const [modalVisibleAddPasta, setModalVisibleAddPasta] = useState(false);
     const [locationX, setLocationX] = useState(0);
     const [locationY, setLocationY] = useState(0);
@@ -45,10 +47,15 @@ export default function CriarEditarCards({navigation, route}) {
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            reCarregaTreeView();
+            //console.log(route);
+            if((route != null && route.params != null && route.params.recarregar))
+            {
+                console.log('recarregou');
+                reCarregaTreeView();
+            }
         });
         return unsubscribe;
-    }, [navigation]);
+    }, [route],[navigation]);
 
     //const [appState, setAppState] = useState(AppState.currentState);
     //const handleAppStateChange = (state: any) => {
@@ -64,16 +71,10 @@ export default function CriarEditarCards({navigation, route}) {
     //    console.log(appState);
     //});
 
-    if(!carregouPastas)
-    {
-        reCarregaTreeView();
-    }
-
     function reCarregaTreeView(){
         var auxLista = [];
         findAll().then((result) => 
-        {          
-            setCarregouPastas(true);         
+        {         
             auxLista = result;
             findAllFlashCards().then((result2) => 
             {          
@@ -99,6 +100,15 @@ export default function CriarEditarCards({navigation, route}) {
         
         setNodeLongPress(node);
         setModalVisible(true);
+    }
+
+    function testePress({node, level, evt}){
+               
+        setMenuVisible(true);
+    }
+
+    function closeMenu({node, level, evt}){               
+        setMenuVisible(false);
     }
 
     function onPress({node, level}){
@@ -149,7 +159,8 @@ export default function CriarEditarCards({navigation, route}) {
     ];
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'rgb(194, 202, 208)' }}>
+                
             <ScrollView style={{ flex: 1, padding: 10 }}>
                 <TreeView                         
                     getCollapsedNodeHeight={() => 35}
@@ -162,7 +173,7 @@ export default function CriarEditarCards({navigation, route}) {
                                         marginLeft: 25 * level,
                                         fontSize: 23,
                                     }}>
-                                    {getIndicator(isExpanded, hasChildrenNodes, node)} {node.nome} 
+                                    {getIndicator(isExpanded, hasChildrenNodes, node)} {node.nome}                                     
                                 </Text>
                             </View>               
                         );
@@ -171,10 +182,14 @@ export default function CriarEditarCards({navigation, route}) {
                     onNodePress={onPress}
                 />
                 <PopUpOptions carregarTreeview={reCarregaTreeView} modalVisible={modalVisible} setModalVisible={setModalVisible} locationY={locationY} idLongPress={nodeLongPress} navigation={navigation}   />
+                
             </ScrollView>
             <ModalCriarEditarPasta carregarTreeview={reCarregaTreeView} modalVisible={modalVisibleAddPasta} setModalVisible={setModalVisibleAddPasta}  />
             <FloatingAction
                 actions={actions}
+                active={true}
+                showBackground={true}
+                overlayColor={'rgba(192,192,192,0.7)'}
                 onPressItem={name => {
                     if(name == "bt_addPasta"){
                         setModalVisibleAddPasta(true);

@@ -17,25 +17,52 @@ import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function BottomTabNavigator({ route, navigation }) {
-  const colorScheme = useColorScheme();
-
+  
   return (
     <BottomTab.Navigator
       initialRouteName="Criar"
-      tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
+     >
       <BottomTab.Screen
         name="Criar"
         component={TabTwoNavigator}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="duplicate-outline" color={color} />,
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('Root', {
+                screen: 'Criar' ,
+                params: {
+                    screen: 'CriarEditarCards',
+                    params: {
+                        recarregar: false,
+                    },
+                }              
+            });
+          },
+        })}
       />
       <BottomTab.Screen
         name="Cards"
         component={TabOneNavigator}
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="copy-outline" color={color} />,          
-        }}
+          tabBarIcon: ({ color }) => <TabBarIcon name="copy-outline" color={color} />,               
+        }}  
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('Root', {
+                screen: 'Cards',
+                params: {
+                    screen: 'TabOneScreen',
+                    params: {
+                        nodeBanco: null,
+                    },
+                }
+            });
+          },
+        })}      
       />
     </BottomTab.Navigator>
   );
@@ -44,7 +71,7 @@ export default function BottomTabNavigator({ route, navigation }) {
 // You can explore the built-in icon families and icons on the web at:
 // https://icons.expo.fyi/
 function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']; color: string }) {
-  return <Ionicons size={30} style={{ marginBottom: -3 }} {...props} />;
+  return <Ionicons size={20} style={{ marginBottom: -3}} {...props} />;
 }
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
@@ -72,6 +99,7 @@ function TabTwoNavigator() {
       <TabTwoStack.Screen
         name="CriarEditarCards"
         component={CriarEditarCards}
+        initialParams={{ recarregar: true}}
         options={{ headerTitle: 'Criar/Editar Cards' }}
       />
     </TabTwoStack.Navigator>

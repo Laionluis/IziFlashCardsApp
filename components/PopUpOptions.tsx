@@ -1,54 +1,74 @@
 import React, { useState } from 'react';
 import { Alert, Modal, StyleSheet, Text, TouchableHighlight,TouchableWithoutFeedback, View, TouchableOpacity } from 'react-native';
-import {deletePasta, deleteSubPastaPorId, deleteSubPastaPorPai} from '../services/pastaService';
+import {deletePasta, deleteSubPastaPorId, deleteSubPastaPorPai, deleteFlashCardsPorId} from '../services/pastaService';
 import ModalCriarEditarPasta from '../components/ModalNovaPasta';
+import { Button, Menu, Divider, Provider } from 'react-native-paper';
 
 export default function PopUpOptions({carregarTreeview, modalVisible, setModalVisible, locationY, idLongPress, navigation}) 
 {
     const [modalEditarVisibleAddPasta, setModalEditarVisibleAddPasta] = useState(false);
 
-    function irParaPaginaCriarCard() {
+    function irParaPaginaCriarCard(criarNovo) {
         navigation.navigate('CriarFlashCard', {
             cardBanco: idLongPress,
+            criarNovo: criarNovo
         });
     }
     
     function deletePasta_Click() {  
-        if(idLongPress.children != null)
-        {            
-            deleteSubPastaPorPai(idLongPress.id).then((resp1) => {
-                console.log('deletado subPasta' + idLongPress.id);            
-            }).catch((error) => {
-                console.log(error);
-            });      
-        }
-
-        if(idLongPress.parent != null){
-            deleteSubPastaPorId(idLongPress.id).then((resp1) => {
-                console.log('deletado SubPasta' + idLongPress.id);
+        
+        if(idLongPress.ehFlashCard){
+            deleteFlashCardsPorId(idLongPress.id.substring(0, idLongPress.id.length - 1)).then((resp1) => {
+                console.log('deletado flashCard' + idLongPress.id);    
                 carregarTreeview();
-                setModalVisible(false);
+                setModalVisible(false);        
             }).catch((error) => {
                 console.log(error);
-            });   
+            });    
         } else{
-            deletePasta(idLongPress.id).then((resp1) => {
-                console.log('deletado Pasta' + idLongPress.id);
-                carregarTreeview();
-                setModalVisible(false);
-            }).catch((error) => {
-                console.log(error);
-            });   
-        }   
+            if(idLongPress.children != null)
+            {            
+                deleteSubPastaPorPai(idLongPress.id).then((resp1) => {
+                    console.log('deletado subPasta' + idLongPress.id);        
+                    carregarTreeview();
+                    setModalVisible(false);    
+                }).catch((error) => {
+                    console.log(error);
+                });      
+            }
+
+            if(idLongPress.parent != null){
+                deleteSubPastaPorId(idLongPress.id).then((resp1) => {
+                    console.log('deletado SubPasta' + idLongPress.id);
+                    carregarTreeview();
+                    setModalVisible(false);
+                }).catch((error) => {
+                    console.log(error);
+                });   
+            } else{
+                deletePasta(idLongPress.id).then((resp1) => {
+                    console.log('deletado Pasta' + idLongPress.id);
+                    carregarTreeview();
+                    setModalVisible(false);
+                }).catch((error) => {
+                    console.log(error);
+                });   
+            }   
+        }        
     }
 
     function editarPasta_Click(){
         if(idLongPress.ehFlashCard){
             setModalVisible(false);
-            irParaPaginaCriarCard();
+            irParaPaginaCriarCard(false);
         } else{            
             setModalEditarVisibleAddPasta(true);
         }
+    }
+
+    function criarFlashCard_Click(){        
+        setModalVisible(false);
+        irParaPaginaCriarCard(true);         
     }
 
     return (
@@ -56,6 +76,7 @@ export default function PopUpOptions({carregarTreeview, modalVisible, setModalVi
             <Modal
                 transparent={true}
                 visible={modalVisible}
+                seNativeDriver={true}
                 onRequestClose={() => {
                     setModalVisible(!modalVisible);
                 }}>
@@ -64,17 +85,12 @@ export default function PopUpOptions({carregarTreeview, modalVisible, setModalVi
                     <View style={styles.modalOverlay} />
                 </TouchableWithoutFeedback>
 
-                <View style={{top: locationY-10, flex: 1, alignItems: 'center', right: 30}}>
+                <View style={{top: locationY-10, alignItems: 'flex-start', left: 40}}>
                     <View style={styles.modalView}>
-                        {idLongPress.ehFlashCard == null && <TouchableOpacity style={styles.buttonTouch} onPress={() => {editarPasta_Click()}}>
-                            <Text style={styles.modalText}>Criar</Text>
-                        </TouchableOpacity>}
-                        <TouchableOpacity style={styles.buttonTouch} onPress={() => {editarPasta_Click()}}>
-                            <Text style={styles.modalText}>Editar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonTouch} onPress={() => {deletePasta_Click()}}>
-                            <Text style={styles.modalText}>Excluir</Text>    
-                        </TouchableOpacity>            
+                        {idLongPress.ehFlashCard == null && <Menu.Item onPress={() => {criarFlashCard_Click()}} title="Criar" />}
+                        <Menu.Item onPress={() => {editarPasta_Click()}} title="Editar" />
+                        <Menu.Item onPress={() => {deletePasta_Click()}} title="Excluir" />
+                                
                     </View>
                 </View>
             </Modal>
@@ -85,17 +101,9 @@ export default function PopUpOptions({carregarTreeview, modalVisible, setModalVi
 
 const styles = StyleSheet.create({
     modalView: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 20,
+        backgroundColor: 'white',       
+        
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
         elevation: 4,
     },
     textStyle: {
@@ -105,7 +113,7 @@ const styles = StyleSheet.create({
     },
     modalText: {
         fontSize: 18,
-        width: 50,
+        width: 90,
         textAlign: "center",
     },
     modalOverlay: {
@@ -115,12 +123,6 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: 'transparent'
-    },
-    separator: {
-        borderBottomColor: "black", 
-        borderBottomWidth: StyleSheet.hairlineWidth, 
-        alignSelf:'stretch',
-        width: 70
     },
     buttonTouch: {
         alignItems: 'center',
