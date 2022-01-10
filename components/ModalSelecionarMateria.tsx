@@ -3,6 +3,7 @@ import { Alert, Modal, StyleSheet, Text,TextInput, Button, View, TouchableWithou
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {addData, insereSubPasta, atualizarPasta, atualizarSubPasta, deleteSubPastaPorId,findAll} from '../services/pastaService';
 import ModalCriarEditarPasta from './ModalNovaPasta';
+import { translate } from '../i18n/scr/locales'
 
 export default function ModalSelecionarMateria({modalVisible, setModalVisible, setMateria, setAssunto})
 {
@@ -60,7 +61,7 @@ export default function ModalSelecionarMateria({modalVisible, setModalVisible, s
 
                         <TouchableOpacity style={styles.addCardButton} onPress={() => setModalVisibleAddPasta(true)}>
                             <Icon name='add' size={28} color='#01a699' />
-                            <Text style={{ paddingRight: 5}}> Adicionar Matéria </Text>
+                            <Text style={{ paddingRight: 5}}>{translate('AddMateriuas')}</Text>
                         </TouchableOpacity>
                     
 

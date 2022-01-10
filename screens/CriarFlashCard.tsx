@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types';
 import ModalSelecionarMateria from '../components/ModalSelecionarMateria';
 import ModalSelecionarAssunto from '../components/ModalSelecionarAssunto';
 import {insereFlashCard, insereCards, findFlashCardPorId, findByIdPasta,findCardsPorIdFlashCard,atualizarFlashCard, atualizarCard, deleteCardPorId} from '../services/pastaService';
+import { translate } from '../i18n/scr/locales'
 
 export default function CriarFlashCard({ route, navigation }) {
   const [flashCards, setFlashCards] = useState([]);
@@ -14,8 +15,8 @@ export default function CriarFlashCard({ route, navigation }) {
   const [verso, setVerso] = useState('');
   const [nomeError, setNomeError] = useState('');
   const [sucesso, setSucesso] = useState('');
-  const [materia, setMateria] = useState({nome: 'Matéria'});
-  const [assunto, setAssunto] = useState({nome: 'Assunto'});
+  const [materia, setMateria] = useState({nome: translate('materia')});
+  const [assunto, setAssunto] = useState({nome: translate('assunto')});
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleAssunto, setModalVisibleAssunto] = useState(false);
   const [apertouSalvar, setApertouSalvar] = useState(false);
@@ -35,7 +36,7 @@ export default function CriarFlashCard({ route, navigation }) {
   function limpaCampos(){
     setTerminou(true);
     setApertouSalvar(false);
-    setSucesso("FlashCard salvo com sucesso.");
+    setSucesso(translate('Sucesso2'));
     setTitulo('');
     setFrente('');
     setVerso('');
@@ -86,7 +87,7 @@ export default function CriarFlashCard({ route, navigation }) {
   function addFlashCard(ehPrimeiro) {  
         
         if (frente.trim() === "" || verso.trim() === "") {
-            setNomeError("Frente e Verso são campos obrigatórios.");
+            setNomeError(translate('Obrigatorio4'));
             setSucesso('');
         } else {     
             setNomeError(null);
@@ -119,10 +120,10 @@ export default function CriarFlashCard({ route, navigation }) {
 
   function salvarFlashCard(){
     if (titulo.trim() === "") {
-        setNomeError("O campo 'Título' é obrigatório.");
+        setNomeError(translate('Obrigatorio3'));
         setSucesso('');
     } else if (flashCards.length == 0){
-      setNomeError("Adicionar pelo menos um card.");
+      setNomeError(translate('Obrigatorio5'));
       setSucesso('');
     }     
     else {
@@ -242,13 +243,13 @@ export default function CriarFlashCard({ route, navigation }) {
     return(
       <View>
         <View style={styles.container2}>              
-            <TextInput style = {styles.input} placeholder="Frente" multiline={true} onChangeText={text => setFrente(text)} value={frente}/>
-            <TextInput style = {styles.input2} placeholder="Verso" multiline={true} onChangeText={text => setVerso(text)} value={verso}/>       
+            <TextInput style = {styles.input} placeholder={translate('Frente')} multiline={true} onChangeText={text => setFrente(text)} value={frente}/>
+            <TextInput style = {styles.input2} placeholder={translate('Verso')} multiline={true} onChangeText={text => setVerso(text)} value={verso}/>       
         </View>
         <View style={styles.container3}>
           <TouchableOpacity style={styles.addCardButton} onPress={() => addFlashCard(ehPrimeiro)}>
               <Icon name='add' size={28} color='#01a699' />
-              <Text style={{ paddingRight: 5}}> Adicionar Card </Text>
+              <Text style={{ paddingRight: 5}}>{translate('AddCard2')}</Text>
           </TouchableOpacity>
         </View>
       </View>);
@@ -274,13 +275,13 @@ export default function CriarFlashCard({ route, navigation }) {
                     {flashCards.map((data, index) =>    
                         <View key={data.id}  >
                             <View style={styles.container2}>              
-                                <TextInput style = {styles.input} placeholder="Frente" multiline={true} value={data.frente} onChangeText={text => onChangeTextFrente(text, index)} />
-                                <TextInput style = {styles.input2} placeholder="Verso" multiline={true} value={data.verso} onChangeText={text => onChangeTextVerso(text, index)}/>       
+                                <TextInput style = {styles.input} placeholder={translate('Frente')} multiline={true} value={data.frente} onChangeText={text => onChangeTextFrente(text, index)} />
+                                <TextInput style = {styles.input2} placeholder={translate('Verso')} multiline={true} value={data.verso} onChangeText={text => onChangeTextVerso(text, index)}/>       
                             </View>
                             <View style={styles.container3}>
                               <TouchableOpacity style={styles.addCardButton} onPress={() => removerFlashCard(data)}>
                                   <Icon name='clear' size={28} color='#01a699' />
-                                  <Text style={{ paddingRight: 5}}> Remover Card </Text>
+                                  <Text style={{ paddingRight: 5}}>{translate('DeleteCard')}</Text>
                               </TouchableOpacity>
                             </View>
                            
@@ -300,7 +301,7 @@ export default function CriarFlashCard({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <TextInput style = {styles.input0} placeholder="Título" onChangeText={text => setTitulo(text)} value={titulo} />
+      <TextInput style = {styles.input0} placeholder={translate('Titulo')} onChangeText={text => setTitulo(text)} value={titulo} />
       
       {!!nomeError && (
       <Text style={{ color: "red" }}>{nomeError}</Text>
@@ -326,7 +327,7 @@ export default function CriarFlashCard({ route, navigation }) {
 
         <TouchableOpacity style = {styles.submitButton} onPress={() => salvarFlashCard()}>
        
-          <Text style={apertouSalvar? {display: 'none'} : !terminou? {display: 'flex', color: 'white'} : {display: 'none'}}> Salvar </Text>
+          <Text style={apertouSalvar? {display: 'none'} : !terminou? {display: 'flex', color: 'white'} : {display: 'none'}}>{translate('Salvar')}</Text>
           <ActivityIndicator size="small" color="#00ff00" 
               style={apertouSalvar && !terminou? {display: 'flex'} : {display: 'none'}} 
           />

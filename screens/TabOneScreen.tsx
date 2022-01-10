@@ -6,11 +6,12 @@ import EditScreenInfo from '../components/EditScreenInfo';
 import MyCarousel from '../components/Carrossel';
 import { Text, View } from '../components/Themed';
 import {findCardsPorIdFlashCard} from '../services/pastaService';
+import { translate } from '../i18n/scr/locales'
 
 export default function TabOneScreen({ route, navigation }) {
 
   const [flashCards, setFlashCards] = useState([]);
-  const [titulo, setTitulo] = useState('Nenhum card selecionado!');
+  const [titulo, setTitulo] = useState(translate('NenhumCardSelecionado'));
   const [idPagina, setIdPagina] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeSide, setActiveSide] = useState(false);

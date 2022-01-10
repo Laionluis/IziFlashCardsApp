@@ -10,6 +10,14 @@ import TreeView from '../components/TreeView'
 import FloatingAction from '../components/FloatingButton'
 import {findAll, findAllSubPasta, findAllFlashCards} from '../services/pastaService';
 import CriarFlashCard from '../screens/CriarFlashCard';
+import { translate } from '../i18n/scr/locales'
+
+import {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+} from 'expo-ads-admob';
 
 const window = Dimensions.get("window");
 
@@ -44,6 +52,7 @@ export default function CriarEditarCards({navigation, route}) {
     const [carregouPastas, setCarregouPastas] = useState(0);  //pra nao ficar carregando toda hora 
     const [listaTreeview, setListaTreeview] = useState([]);
     const [zIndexFloatButton, setZIndexFloatButton] = useState();
+    const [hasAd, setHasAd] = useState(false);
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -56,20 +65,6 @@ export default function CriarEditarCards({navigation, route}) {
         });
         return unsubscribe;
     }, [route],[navigation]);
-
-    //const [appState, setAppState] = useState(AppState.currentState);
-    //const handleAppStateChange = (state: any) => {
-    //    setAppState(state);
-    //}
-    //useEffect(() => {
-    //    AppState.addEventListener('change', handleAppStateChange);
-    //    return (() => {
-    //        AppState.removeEventListener('change', handleAppStateChange);
-    //    })
-    //}, []);
-    //useEffect(() => {
-    //    console.log(appState);
-    //});
 
     function reCarregaTreeView(){
         var auxLista = [];
@@ -145,60 +140,85 @@ export default function CriarEditarCards({navigation, route}) {
 
     const actions = [
         {
-            text: "Adicionar Matéria/Assunto",
+            text: translate('AddMateriaAssunto'),
             icon: <Icon name='add' size={28} color='#01a699' />,
             name: "bt_addPasta",
             position: 2
         },
         {
-            text: "Adicionar Card",
+            text: translate('AddCard'),
             icon: <Icon name='add' size={28} color='#01a699' />,
             name: "bt_addCard",
             position: 1
         },  
     ];
 
+    function bannerError(e) {
+        console.log('banner error: ');
+        setHasAd(false);
+    }
+    
+    function adReceived() {
+        console.log('banner ad received: ');
+        setHasAd(true);
+    }
+    function adClicked() {
+        console.log('banner ad clicked: ');
+    }
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'rgb(194, 202, 208)' }}>
-                
-            <ScrollView style={{ flex: 1, padding: 10 }}>
-                <TreeView                         
-                    getCollapsedNodeHeight={() => 35}
-                    data={listaTreeview}
-                    renderNode={({ node, level, isExpanded, hasChildrenNodes }) => {
-                        return (                
-                            <View style={{ paddingBottom: 3, bottom: 3}}  >
-                                <Text
-                                    style={{
-                                        marginLeft: 25 * level,
-                                        fontSize: 23,
-                                    }}>
-                                    {getIndicator(isExpanded, hasChildrenNodes, node)} {node.nome}                                     
-                                </Text>
-                            </View>               
-                        );
+            <View style={{ flex: 1 }}>    
+                <ScrollView style={{ flex: 1, padding: 10 }}>
+                    <TreeView                         
+                        getCollapsedNodeHeight={() => 35}
+                        data={listaTreeview}
+                        renderNode={({ node, level, isExpanded, hasChildrenNodes }) => {
+                            return (                
+                                <View style={{ paddingBottom: 3, bottom: 3}}  >
+                                    <Text
+                                        style={{
+                                            marginLeft: 25 * level,
+                                            fontSize: 23,
+                                        }}>
+                                        {getIndicator(isExpanded, hasChildrenNodes, node)} {node.nome}                                     
+                                    </Text>
+                                </View>               
+                            );
+                        }}
+                        onNodeLongPress={onNodeLongPress}
+                        onNodePress={onPress}
+                    />
+                    <PopUpOptions carregarTreeview={reCarregaTreeView} modalVisible={modalVisible} setModalVisible={setModalVisible} locationY={locationY} idLongPress={nodeLongPress} navigation={navigation}   />
+                    
+                </ScrollView>
+                <ModalCriarEditarPasta carregarTreeview={reCarregaTreeView} modalVisible={modalVisibleAddPasta} setModalVisible={setModalVisibleAddPasta}  />
+                <FloatingAction
+                    actions={actions}
+                    active={true}
+                    showBackground={true}
+                    overlayColor={'rgba(192,192,192,0.7)'}
+                    onPressItem={name => {
+                        if(name == "bt_addPasta"){
+                            setModalVisibleAddPasta(true);
+                        } else if(name == "bt_addCard"){
+                            irParaPaginaCriarCard();
+                        }
                     }}
-                    onNodeLongPress={onNodeLongPress}
-                    onNodePress={onPress}
                 />
-                <PopUpOptions carregarTreeview={reCarregaTreeView} modalVisible={modalVisible} setModalVisible={setModalVisible} locationY={locationY} idLongPress={nodeLongPress} navigation={navigation}   />
-                
-            </ScrollView>
-            <ModalCriarEditarPasta carregarTreeview={reCarregaTreeView} modalVisible={modalVisibleAddPasta} setModalVisible={setModalVisibleAddPasta}  />
-            <FloatingAction
-                actions={actions}
-                active={true}
-                showBackground={true}
-                overlayColor={'rgba(192,192,192,0.7)'}
-                onPressItem={name => {
-                    if(name == "bt_addPasta"){
-                        setModalVisibleAddPasta(true);
-                    } else if(name == "bt_addCard"){
-                        irParaPaginaCriarCard();
-                    }
-                }}
-            />
-        
+            </View>
+            <View style={!hasAd ? { height: 0 } : {}}>
+                <View>
+                    <AdMobBanner
+                        bannerSize="smartBanner"
+                        adUnitID="ca-app-pub-7818959313803057/4602804469" // Test ID, Replace with your-admob-unit-id
+                        servePersonalizedAds={false} // true or false
+                        onDidFailToReceiveAdWithError={bannerError}
+                        onAdViewDidReceiveAd={adReceived}
+                        onAdViewWillPresentScreen={adClicked}
+                    />
+                </View>
+            </View>
         </SafeAreaView>
     );
 }

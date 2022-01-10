@@ -26,7 +26,11 @@
         "foregroundImage": "./assets/images/FlashCardsLOGO.png",
         "backgroundColor": "#ffffff"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-7818959313803057~3035212552"
+      },
+      "package": "com.laionluis.IziFlashCardsApp"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

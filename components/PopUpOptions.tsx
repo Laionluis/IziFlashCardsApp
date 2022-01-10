@@ -3,6 +3,7 @@ import { Alert, Modal, StyleSheet, Text, TouchableHighlight,TouchableWithoutFeed
 import {deletePasta, deleteSubPastaPorId, deleteSubPastaPorPai, deleteFlashCardsPorId} from '../services/pastaService';
 import ModalCriarEditarPasta from '../components/ModalNovaPasta';
 import { Button, Menu, Divider, Provider } from 'react-native-paper';
+import { translate } from '../i18n/scr/locales'
 
 export default function PopUpOptions({carregarTreeview, modalVisible, setModalVisible, locationY, idLongPress, navigation}) 
 {
@@ -87,9 +88,9 @@ export default function PopUpOptions({carregarTreeview, modalVisible, setModalVi
 
                 <View style={{top: locationY-10, alignItems: 'flex-start', left: 40}}>
                     <View style={styles.modalView}>
-                        {idLongPress.ehFlashCard == null && <Menu.Item onPress={() => {criarFlashCard_Click()}} title="Criar" />}
-                        <Menu.Item onPress={() => {editarPasta_Click()}} title="Editar" />
-                        <Menu.Item onPress={() => {deletePasta_Click()}} title="Excluir" />
+                        {idLongPress.ehFlashCard == null && <Menu.Item onPress={() => {criarFlashCard_Click()}} title={translate('Criar')} />}
+                        <Menu.Item onPress={() => {editarPasta_Click()}} title={translate('Editar')} />
+                        <Menu.Item onPress={() => {deletePasta_Click()}} title={translate('Excluir')} />
                                 
                     </View>
                 </View>

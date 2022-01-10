@@ -56,25 +56,25 @@ export default function MyCarousel({carouselItems, activeIndex, setActiveIndex, 
         cardContainer: {
             flex: 1,
             top: 20,
-            bottom: 20,
-            width: width - 60,
+            bottom: 15,
+            width: width - 40,
         },
         card1: {
             backgroundColor: '#1d86ba',
             borderRadius: 20,
             borderWidth: 2,
-            height: height - 250
+            height: height - 255
         },
         card2: {
             backgroundColor: '#4cae7b',
             borderRadius: 20,
             borderWidth: 2,
-            height: height - 250
+            height: height - 255
         },
     });
     
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor:'rgb(194, 202, 208)', paddingTop: 10, width: '100%' }}>             
+        <SafeAreaView style={{flex: 1, backgroundColor:'rgb(194, 202, 208)', Top: 20, width: '100%' }}>             
             <View style={{ flex: 1, justifyContent: 'center' }}>
                 <Carousel
                     layout={"stack"}
@@ -91,7 +91,7 @@ export default function MyCarousel({carouselItems, activeIndex, setActiveIndex, 
                     dotStyle={{
                         width: 10,
                         height: 7,
-                        borderRadius: 5,
+                        borderRadius: 2,
                         backgroundColor: 'rgba(0, 0, 0, 0.92)'
                     }}
                     inactiveDotOpacity={0.4}

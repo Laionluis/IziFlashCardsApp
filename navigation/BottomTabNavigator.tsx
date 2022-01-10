@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
-
+import { translate } from '../i18n/scr/locales';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import TabOneScreen from '../screens/TabOneScreen';
@@ -100,7 +100,7 @@ function TabTwoNavigator() {
         name="CriarEditarCards"
         component={CriarEditarCards}
         initialParams={{ recarregar: true}}
-        options={{ headerTitle: 'Criar/Editar Cards' }}
+        options={{ headerTitle: translate('CriarEditarCard') }}
       />
     </TabTwoStack.Navigator>
   );

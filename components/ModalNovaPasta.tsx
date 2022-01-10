@@ -2,6 +2,7 @@ import React, { useState, Fragment } from "react";
 import { Alert, Modal, StyleSheet, Text,TextInput, Button, View, TouchableWithoutFeedback, TouchableOpacity, Image, ActivityIndicator, CheckBox,ScrollView } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {addData, insereSubPasta, atualizarPasta, atualizarSubPasta, deleteSubPastaPorId,findByIdPasta} from '../services/pastaService';
+import { translate } from '../i18n/scr/locales'
 
 export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, setModalVisible, nodeEditar})
 {
@@ -19,7 +20,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
     function limpaCampos(){
         setTerminou(true);
         setApertouSalvar(false);
-        setSucesso("Matéria salva com sucesso.");
+        setSucesso(translate('Sucesso1'));
         setPasta('');
         setSubPasta('');
         setSubPastas([]);
@@ -76,7 +77,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
 
     function salvar() {  
         if (pasta.trim() === "") {
-            setNomeError("Matéria é obrigatório.");
+            setNomeError(translate('Obrigatorio1'));
             setSucesso('');
         } else {         
             if(nodeEditar != null && nodeEditar.id > 0)
@@ -129,7 +130,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
 
     function addSubPasta(ehPrimeiro) {  
         if (subPasta.trim() === "") {
-            setNomeError("Assunto é obrigatório.");
+            setNomeError(translate('Obrigatorio2'));
             setSucesso('');
         } else {     
             setNomeError(null);
@@ -211,7 +212,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
             <View style={styles.fixToText2}>
                 <TextInput style = {styles.input2}
                 underlineColorAndroid = "transparent"
-                placeholder = "Assunto"
+                placeholder = {translate('assunto')}
                 placeholderTextColor = "#9a73ef"
                 autoCapitalize = "none"
                 onChangeText={text => setSubPasta(text)}
@@ -247,7 +248,7 @@ export default function ModalCriarEditarPasta({carregarTreeview, modalVisible, s
                         <View key={data.idTemp}  style={styles.fixToText2}>
                             <TextInput style = {styles.input2}
                             underlineColorAndroid = "transparent"
-                            placeholder = "Assunto"
+                            placeholder =  {translate('assunto')}
                             placeholderTextColor = "#9a73ef"
                             autoCapitalize = "none"
                             editable={true}
@@ -307,7 +308,7 @@ return (
             <View style={styles.modalView}>            
                 <TextInput style = {styles.input}
                 underlineColorAndroid = "transparent"
-                placeholder = "Matéria"
+                placeholder =  {translate('materia')}
                 placeholderTextColor = "#9a73ef"
                 autoCapitalize = "none"
                 onChangeText={text => setPasta(text)}
@@ -324,12 +325,12 @@ return (
                     <TouchableOpacity
                         style={styles.Buttons}                                    
                         onPress={() => setModalVisible(!modalVisible)}>
-                        <Text style={{color: 'white'}}> Cancelar </Text>        
+                        <Text style={{color: 'white'}}>{translate('Cancelar')}</Text>        
                     </TouchableOpacity>  
                     <TouchableOpacity
                         style={styles.Buttons}                                    
                         onPress={() => salvar()}>
-                        <Text style={apertouSalvar? {display: 'none'} : !terminou? {display: 'flex', color: 'white'} : {display: 'none'}}> Salvar </Text>
+                        <Text style={apertouSalvar? {display: 'none'} : !terminou? {display: 'flex', color: 'white'} : {display: 'none'}}>{translate('Salvar')}</Text>
                         <ActivityIndicator size="small" color="#00ff00" 
                             style={apertouSalvar && !terminou? {display: 'flex'} : {display: 'none'}} 
                         />
