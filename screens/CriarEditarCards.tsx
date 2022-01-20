@@ -1,7 +1,6 @@
 import React, { useState, Fragment, useEffect  } from "react";
 import { StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView, Text, View, TouchableWithoutFeedback, TouchableOpacity, Dimensions, AppState } from 'react-native';
-//import TreeView from 'react-native-final-tree-view';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ModalCriarEditarPasta from '../components/ModalNovaPasta';
 import PopUpOptions from '../components/PopUpOptions'

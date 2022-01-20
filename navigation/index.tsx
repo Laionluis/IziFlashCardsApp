@@ -5,7 +5,6 @@ import * as React from 'react';
 import { ColorSchemeName } from 'react-native';
 import { translate } from '../i18n/scr/locales';
 
-import NotFoundScreen from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import BottomTabNavigator from './BottomTabNavigator';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -43,8 +42,7 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Root" component={BottomTabNavigator} />
-      <Stack.Screen name="CriarFlashCard" component={CriarFlashCard}  options={{ headerShown: true, title: translate('CriarCard') }}  />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      <Stack.Screen name="CriarFlashCard" component={CriarFlashCard}  options={{ headerShown: true, title: translate('CriarCard') }}  />      
     </Stack.Navigator>
   );
 }

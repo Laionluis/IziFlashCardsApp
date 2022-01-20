@@ -6,7 +6,6 @@
     "orientation": "default",
     "icon": "./assets/images/LogoFlashCards.png",
     "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/FlashCardsLOGO.png",
       "resizeMode": "contain",
