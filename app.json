@@ -29,7 +29,8 @@
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-7818959313803057~3035212552"
       },
-      "package": "com.laionluis.IziFlashCardsApp"
+      "package": "com.laionluis.IziFlashCardsApp",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
